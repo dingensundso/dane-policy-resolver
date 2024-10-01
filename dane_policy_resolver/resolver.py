@@ -94,7 +94,7 @@ class Handler(server.RequestHandler):
             domain = key.decode()
             if cmd == b"get":
                 for mx_record in get_mx_records(domain):
-                    mx = str(mx_record)
+                    mx = mx_record.exchange.to_text()
                     if has_dane_record(mx):
                         logger.info("Found TLSA record for %s (%s)" % (mx, domain))
                         conn.sendall(b"200 dane-only\n")
