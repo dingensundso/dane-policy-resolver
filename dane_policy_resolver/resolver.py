@@ -72,7 +72,7 @@ def get_mx_records(domain: str, timeout: int = 10) -> List[dns.rdtypes.ANY.MX.MX
         )
         return sorted(list(result), key=lambda r: r.preference)
     except Exception as e:
-        logger.warn(f"Failed to get MX record for {domain}: {e}")
+        logger.error(f"Failed to get MX record for {domain}: {e}")
         return []
 
 
