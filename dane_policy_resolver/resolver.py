@@ -58,6 +58,16 @@ def has_dane_record(domain, timeout=10):
         pass
 
 
+def is_dnssec_supported():
+    logger.info("Checking first reachable nameserver for DNSSEC support.")
+    try:
+        result = resolver.resolve("isc.org", lifetime=5)
+        return result.response.flags & dns.flags.AD
+    except dns.exception.Timeout:
+        logger.error("DNS timeout while checking for DNSSEC support")
+    return False
+
+
 class Handler(server.RequestHandler):
     def handle_data(self, data):
         conn = self.request

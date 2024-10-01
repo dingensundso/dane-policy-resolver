@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 
 import typer
 
-from .resolver import Handler, resolver
+from .resolver import Handler, is_dnssec_supported, resolver
 from .server import run_server
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,11 @@ def main(
     ] = None,
     loglevel: Annotated[LogLevels, typer.Option(case_sensitive=False)] = LogLevels.INFO,
 ):
+    logging.basicConfig(level=getattr(logging, loglevel))
     if nameservers:
         resolver.nameservers = nameservers.split(",")
-    logging.basicConfig(level=getattr(logging, loglevel))
+    if not is_dnssec_supported():
+        raise RuntimeError(
+            "DNS resolver is not DNSSEC capable or timed out. Please use a different one."
+        )
     run_server(host, port, handler=Handler)
