@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+from logging.handlers import SysLogHandler
 import sys
 
 import dns.resolver
@@ -9,6 +10,8 @@ import dns.flags
 import dns.rdtypes
 import dns.rdatatype
 import dns.rdataclass
+
+logger = logging.getLogger("dane-policy-resolver")
 
 resolver = dns.resolver.Resolver()
 resolver.use_edns(0, dns.flags.DO, 1232)
@@ -37,34 +40,41 @@ def has_dane_record(domain, timeout=10):
         # If the DNSSEC data is invalid and the DNS resolver is DNSSEC enabled
         # we will receive this non-specific exception. The safe behaviour is to
         # accept to defer the email.
-        logging.warning(
+        logger.warning(
             f"Unable to lookup the TLSA record for {domain}. Is the DNSSEC zone okay on https://dnsviz.net/d/{domain}/dnssec/?"
         )
         return True
     except dns.exception.Timeout:
-        logging.warning(
+        logger.warning(
             f"Timeout while resolving the TLSA record for {domain} ({timeout}s)."
         )
     except (dns.resolver.NXDOMAIN, dns.name.EmptyLabel):
         pass  # this is expected, not TLSA record is fine
     except Exception as e:
-        logging.info(f"Error while looking up the TLSA record for {domain} {e}")
+        logger.info(f"Error while looking up the TLSA record for {domain} {e}")
         pass
 
 
 if __name__ == "__main__":
+    logger.setLevel(logging.DEBUG)
+    handler = SysLogHandler(facility=SysLogHandler.LOG_MAIL, address="/dev/log")
+    formatter = logging.Formatter("%(name)s[%(process)d]: %(levelname)s: %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
     data = sys.stdin.readline()
     buffer = sys.stdout.buffer
     try:
         cmd, key = data.split()
         if cmd == "get":
             if has_dane_record(key):
+                logger.debug("Found TLSA record for %s" % key)
                 buffer.write(b"200 dane-only\n")
             else:
+                logger.debug("No TLSA record found for %s" % key)
                 buffer.write(b"500 no dane record found\n")
         else:
-            logging.error("unknown command: {}".format(data))
+            logger.error("unknown command: {}".format(data))
             buffer.write(b"500 unknown command\n")
     except ValueError:
-        logging.error("Received malformed data: {}".format(data))
+        logger.error("Received malformed data: {}".format(data))
         buffer.write(b"500 malformed data\n")
