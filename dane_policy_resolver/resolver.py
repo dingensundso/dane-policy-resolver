@@ -70,10 +70,13 @@ def get_mx_records(domain: str, timeout: int = 10) -> List[dns.rdtypes.ANY.MX.MX
             dns.rdataclass.IN,
             lifetime=timeout,
         )
-        return sorted(list(result), key=lambda r: r.preference)
+        if result.response.flags & dns.flags.AD:
+            return sorted(list(result), key=lambda r: r.preference)
+        else:
+            logger.info(f"Domain {domain} is not DNSSEC enabled")
     except Exception as e:
         logger.error(f"Failed to get MX record for {domain}: {e}")
-        return []
+    return []
 
 
 def is_dnssec_supported() -> bool:
