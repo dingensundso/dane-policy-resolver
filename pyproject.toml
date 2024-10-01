@@ -17,8 +17,11 @@ dependencies = [
 Homepage = "https://github.com/dingensundso/dane-policy-resolver"
 
 [project.scripts]
-dane-policy-resolver = "dane_policy_resolver:main"
+dane-policy-resolver = "dane_policy_resolver:__main__"
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dane_policy_resolver"]

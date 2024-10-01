@@ -1,7 +1,4 @@
 import logging
-import typer
-from typing import Annotated, Optional
-from enum import Enum
 
 import dns.resolver
 import dns.exception
@@ -17,14 +14,6 @@ logger = logging.getLogger(__name__)
 resolver = dns.resolver.Resolver()
 resolver.use_edns(0, dns.flags.DO, 1232)
 resolver.flags = dns.flags.AD | dns.flags.RD
-
-
-class LogLevels(str, Enum):
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
 
 
 def has_dane_record(domain, timeout=10):
@@ -87,20 +76,3 @@ class Handler(server.RequestHandler):
         except ValueError:
             logger.error("Received malformed data: {}".format(data))
             conn.sendall(b"500 malformed data\n")
-
-
-def main(
-    host: str = "localhost",
-    port: int = 8460,
-    nameservers: Annotated[
-        Optional[str],
-        typer.Option(
-            help="comma-seperated list of nameservers. default uses /etc/resolv.conf"
-        ),
-    ] = None,
-    loglevel: Annotated[LogLevels, typer.Option(case_sensitive=False)] = LogLevels.INFO,
-):
-    if nameservers:
-        resolver.nameservers = nameservers.split(",")
-    logging.basicConfig(level=getattr(logging, loglevel))
-    server.run_server(host, port, handler=Handler)

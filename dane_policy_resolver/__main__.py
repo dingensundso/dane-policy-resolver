@@ -1,3 +1,4 @@
+import typer
 from . import main
 
-main()
+typer.run(main)

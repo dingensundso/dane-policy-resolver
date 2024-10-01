@@ -1,4 +1,2 @@
-import typer
-from .resolver import main as resolver_main
-
-typer.run(resolver_main)
+from .main import main as main
+from .server import run_server as run_server
