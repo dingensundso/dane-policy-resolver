@@ -1,4 +1,6 @@
 import logging
+import typer
+from typing import Annotated, Optional
 
 import dns.resolver
 import dns.exception
@@ -6,6 +8,7 @@ import dns.flags
 import dns.rdtypes
 import dns.rdatatype
 import dns.rdataclass
+
 from . import server
 
 logger = logging.getLogger("dane-policy-resolver")
@@ -77,10 +80,17 @@ class Handler(server.RequestHandler):
             conn.sendall(b"500 malformed data\n")
 
 
-def main():
+def main(
+    host: str = "localhost",
+    port: int = 8460,
+    nameservers: Annotated[
+        Optional[str],
+        typer.Option(
+            help="comma-seperated list of nameservers. default uses /etc/resolv.conf"
+        ),
+    ] = None,
+):
+    if nameservers:
+        resolver.nameservers = nameservers.split(",")
     logging.basicConfig(level=logging.DEBUG)
-    server.run_server(handler=Handler)
-
-
-if __name__ == "__main__":
-    main()
+    server.run_server(host, port, handler=Handler)

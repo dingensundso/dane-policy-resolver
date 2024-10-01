@@ -18,4 +18,7 @@ dane-policy-resolver = "dane_policy_resolver:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-dependencies = ["dnspython"]
+dependencies = [
+	"dnspython",
+	"typer"
+]
