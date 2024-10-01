@@ -8,7 +8,7 @@ import dns.flags
 import dns.rdtypes
 import dns.rdatatype
 import dns.rdataclass
-import server
+from . import server
 
 logger = logging.getLogger("dane-policy-resolver")
 
@@ -74,6 +74,10 @@ class Handler(server.RequestHandler):
             conn.sendall(b"500 malformed data\n")
 
 
-if __name__ == "__main__":
+def main():
     logging.basicConfig(level=logging.DEBUG)
     server.run_server(handler=Handler)
+
+
+if __name__ == "__main__":
+    main()
