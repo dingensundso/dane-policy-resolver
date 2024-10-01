@@ -1,0 +1,32 @@
+[Unit]
+Description=Provide DANE policy map to Postfix
+Before=postfix.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/dane-policy-resolver
+Restart=on-failure
+
+DynamicUser=yes
+AmbientCapabilities=
+CapabilityBoundingSet=
+DevicePolicy=closed
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+SystemCallArchitectures=native
+SystemCallFilter=@basic-io @default @file-system @io-event @ipc @network-io @process @signal @system-service
+UMask=0022
+
+[Install]
+WantedBy=multi-user.target
