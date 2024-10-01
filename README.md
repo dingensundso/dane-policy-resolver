@@ -8,9 +8,10 @@ It can make the usage of [`postfix-mta-sts-resolver`](https://github.com/Snawoot
 Almost all of the code comes from [Mailu](https://github.com/Mailu/Mailu)'s [util.py](https://github.com/Mailu/Mailu/blob/master/core/admin/mailu/utils.py#L54). Thank you to all contributors!
 
 ## Usage
-`dane-policy-resolver` listens on port `8460` by default.
+Use `dane-policy-resolver --help` to view command line options.
+Make sure to use a **DNSSEC-enabled** resolver!
 
-After starting it (e.g. with systemd) we can add `127.0.0.1:8460` as [`tcp_table`](https://www.postfix.org/tcp_table.5.html) to [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) in `/etc/postfix/main.cf`:
+After starting it (e.g. with systemd) we can add the address (e.g. `127.0.0.1:8460`) as [`tcp_table`](https://www.postfix.org/tcp_table.5.html) to [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) in `/etc/postfix/main.cf`:
 
     smtp_tls_policy_maps = tcp:127.0.0.1:8460
 
