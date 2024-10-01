@@ -85,4 +85,15 @@ def run_server(
     with SocketServer((host, port), handler) as server:
         t = threading.Thread(target=server.serve_forever)
         t.start()
+        try:
+            import sd_notify  # type: ignore
+
+            notify = sd_notify.Notifier()
+            if notify.enabled():
+                logger.debug("Notifying systemd that we are ready.")
+                notify.ready()
+            else:
+                logger.debug("Not running as systemd unit.")
+        except ModuleNotFoundError:
+            logger.debug("sd-notify is not installed. Unable to notify systemd.")
         t.join()

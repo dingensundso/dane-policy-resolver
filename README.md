@@ -11,7 +11,13 @@ Almost all of the code comes from [Mailu](https://github.com/Mailu/Mailu)'s [uti
 Use `dane-policy-resolver --help` to view command line options.
 Make sure to use a **DNSSEC-enabled** resolver!
 
-After starting it (e.g. with systemd) we can add the address (e.g. `127.0.0.1:8460`) as [`tcp_table`](https://www.postfix.org/tcp_table.5.html) to [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) in `/etc/postfix/main.cf`:
+### systemd
+There is a systemd service file under `contrib/`. If you want to use it install `dane-policy-resolver` with `[systemd]`. E.g.:
+
+    pip install 'dane-policy-resolver[systemd]'
+
+### Postfix integration
+To use the daemon as a [`tcp_table`](https://www.postfix.org/tcp_table.5.html) for [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) add the following to `/etc/postfix/main.cf`:
 
     smtp_tls_policy_maps = tcp:127.0.0.1:8460
 

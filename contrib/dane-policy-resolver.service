@@ -3,7 +3,7 @@ Description=Provide DANE policy map to Postfix
 Before=postfix.service
 
 [Service]
-Type=simple
+Type=notify
 ExecStart=/usr/local/bin/dane-policy-resolver
 Restart=on-failure
 
