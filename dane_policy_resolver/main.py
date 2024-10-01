@@ -32,6 +32,10 @@ def main(
     logging.basicConfig(level=getattr(logging, loglevel))
     if nameservers:
         resolver.nameservers = nameservers.split(",")
+    logger.info(
+        "Starting dane-policy-resolve with nameservers: %s",
+        ",".join([str(ns) for ns in resolver.nameservers]),
+    )
     if not is_dnssec_supported():
         raise RuntimeError(
             "DNS resolver is not DNSSEC capable or timed out. Please use a different one."
