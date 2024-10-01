@@ -1,10 +1,11 @@
-from typing import Annotated, Optional
 import logging
 from enum import Enum
+from typing import Annotated, Optional
+
 import typer
 
-from .server import run_server
 from .resolver import Handler, resolver
+from .server import run_server
 
 logger = logging.getLogger(__name__)
 

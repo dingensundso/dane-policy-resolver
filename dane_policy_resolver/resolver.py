@@ -1,11 +1,11 @@
 import logging
 
-import dns.resolver
 import dns.exception
 import dns.flags
-import dns.rdtypes
-import dns.rdatatype
 import dns.rdataclass
+import dns.rdatatype
+import dns.rdtypes
+import dns.resolver
 
 from . import server
 
