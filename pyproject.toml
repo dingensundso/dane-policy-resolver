@@ -1,0 +1,21 @@
+[project]
+name = "dane-policy-resolver"
+version = "0.1.0"
+description = "tcp_table daemon for postfix that checks dane policy for hostname"
+authors = [
+	{ name = "Markus Bach", email = "git@dingensundso.de" }
+]
+readme = "README.md"
+license = {file = "LICENSE.md"}
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/dingensundso/dane-policy-resolver"
+
+[project.scripts]
+dane-policy-resolver = "dane_policy_resolver:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+dependencies = ["dnspython"]
