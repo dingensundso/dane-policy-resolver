@@ -28,7 +28,7 @@ def main(
         ),
     ] = None,
     loglevel: Annotated[LogLevels, typer.Option(case_sensitive=False)] = LogLevels.INFO,
-):
+) -> None:
     logging.basicConfig(level=getattr(logging, loglevel))
     if nameservers:
         resolver.nameservers = nameservers.split(",")

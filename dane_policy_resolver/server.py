@@ -70,14 +70,18 @@ class RequestHandler(socketserver.BaseRequestHandler):
             except socket.timeout:
                 continue
 
-    def finish(self):
+    def finish(self) -> None:
         logger.debug("Closing connection from %s:%s", *self.client_address)
 
-    def handle_data(self, data):
+    def handle_data(self, data: bytes) -> None:
         self.request.sendall(data)
 
 
-def run_server(host="localhost", port=8460, handler=RequestHandler):
+def run_server(
+    host: str = "localhost",
+    port: int = 8460,
+    handler: type[socketserver.BaseRequestHandler] = RequestHandler,
+) -> None:
     with SocketServer((host, port), handler) as server:
         t = threading.Thread(target=server.serve_forever)
         t.start()

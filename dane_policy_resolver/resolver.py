@@ -5,6 +5,7 @@ import dns.flags
 import dns.rdataclass
 import dns.rdatatype
 import dns.rdtypes
+import dns.rdtypes.ANY.TLSA
 import dns.resolver
 
 from . import server
@@ -16,7 +17,7 @@ resolver.use_edns(0, dns.flags.DO, 1232)
 resolver.flags = dns.flags.AD | dns.flags.RD
 
 
-def has_dane_record(domain, timeout=10):
+def has_dane_record(domain: str, timeout: int = 10) -> bool:
     """Checks whether domain has a dane record
 
     Copyright 2016 All Mailu contributors at the date.
@@ -56,33 +57,35 @@ def has_dane_record(domain, timeout=10):
     except Exception as e:
         logger.info(f"Error while looking up the TLSA record for {domain} {e}")
         pass
+    return False
 
 
-def is_dnssec_supported():
+def is_dnssec_supported() -> bool:
     logger.info("Checking first reachable nameserver for DNSSEC support.")
     try:
         result = resolver.resolve("isc.org", lifetime=5)
-        return result.response.flags & dns.flags.AD
+        return result.response.flags & dns.flags.AD != 0
     except dns.exception.Timeout:
         logger.error("DNS timeout while checking for DNSSEC support")
     return False
 
 
 class Handler(server.RequestHandler):
-    def handle_data(self, data):
+    def handle_data(self, data: bytes) -> None:
         conn = self.request
         try:
             cmd, key = data.split()
+            domain = key.decode()
             if cmd == b"get":
-                if has_dane_record(key.decode()):
-                    logger.info("Found TLSA record for %s" % key)
+                if has_dane_record(domain):
+                    logger.info("Found TLSA record for %s" % domain)
                     conn.sendall(b"200 dane-only\n")
                 else:
-                    logger.info("No TLSA record found for %s" % key)
+                    logger.info("No TLSA record found for %s" % domain)
                     conn.sendall(b"500 no dane record found\n")
             else:
-                logger.error("unknown command: {}".format(data))
+                logger.error("unknown command: {!r}".format(data))
                 conn.sendall(b"500 unknown command\n")
         except ValueError:
-            logger.error("Received malformed data: {}".format(data))
+            logger.error("Received malformed data: {!r}".format(data))
             conn.sendall(b"500 malformed data\n")
