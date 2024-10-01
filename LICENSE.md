@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2016 All Mailu contributors at the date
+Copyright (c) 2024 Markus Bach
 
 This software consists of voluntary contributions made by multiple individuals.
 For exact contribution history, see the revision history available at

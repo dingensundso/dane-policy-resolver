@@ -16,7 +16,12 @@ resolver.flags = dns.flags.AD | dns.flags.RD
 
 
 def has_dane_record(domain, timeout=10):
-    """Checks whether domain has a dane record"""
+    """Checks whether domain has a dane record
+
+    Copyright 2016 All Mailu contributors at the date.
+    See the LICENSE.md file at the top-level directory of this distribution and
+    https://github.com/Mailu/Mailu/blob/master/LICENSE.md
+    """
     try:
         result = resolver.resolve(
             f"_25._tcp.{domain}",
