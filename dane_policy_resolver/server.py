@@ -29,7 +29,7 @@ class SocketServer(socketserver.ThreadingTCPServer):
 
     def get_request(self) -> tuple[socket.socket, str]:
         conn, addr = super().get_request()
-        logging.info("Starting connection from %s:%s", *addr)
+        logging.debug("Starting connection from %s:%s", *addr)
         return conn, addr
 
     def shutdown(self) -> None:
@@ -39,7 +39,7 @@ class SocketServer(socketserver.ThreadingTCPServer):
 
     def signal_handler(self, signum: int, _: FrameType | None) -> None:
         signame = signal.Signals(signum).name
-        logging.info("%s received." % signame)
+        logging.debug("%s received." % signame)
         self.shutdown()
 
 
@@ -69,7 +69,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 continue
 
     def finish(self):
-        logging.info("Closing connection from %s:%s", *self.client_address)
+        logging.debug("Closing connection from %s:%s", *self.client_address)
 
     def handle_data(self, data):
         self.request.sendall(data)

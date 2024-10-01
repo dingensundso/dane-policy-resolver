@@ -67,10 +67,10 @@ class Handler(server.RequestHandler):
             cmd, key = data.split()
             if cmd == b"get":
                 if has_dane_record(key.decode()):
-                    logger.debug("Found TLSA record for %s" % key)
+                    logger.info("Found TLSA record for %s" % key)
                     conn.sendall(b"200 dane-only\n")
                 else:
-                    logger.debug("No TLSA record found for %s" % key)
+                    logger.info("No TLSA record found for %s" % key)
                     conn.sendall(b"500 no dane record found\n")
             else:
                 logger.error("unknown command: {}".format(data))
