@@ -6,6 +6,8 @@ import socketserver
 import threading
 from types import FrameType
 
+logger = logging.getLogger(__name__)
+
 
 class SocketServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
@@ -14,7 +16,7 @@ class SocketServer(socketserver.ThreadingTCPServer):
     _is_interrupted = False
 
     def server_activate(self) -> None:
-        logging.info(
+        logger.info(
             "Server started on %s:%s",
             *self.server_address,
         )
@@ -29,17 +31,17 @@ class SocketServer(socketserver.ThreadingTCPServer):
 
     def get_request(self) -> tuple[socket.socket, str]:
         conn, addr = super().get_request()
-        logging.debug("Starting connection from %s:%s", *addr)
+        logger.debug("Starting connection from %s:%s", *addr)
         return conn, addr
 
     def shutdown(self) -> None:
         self._is_interrupted = True
-        logging.info("Server is shutting down...")
+        logger.info("Server is shutting down...")
         super().shutdown()
 
     def signal_handler(self, signum: int, _: FrameType | None) -> None:
         signame = signal.Signals(signum).name
-        logging.debug("%s received." % signame)
+        logger.debug("%s received." % signame)
         self.shutdown()
 
 
@@ -60,7 +62,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 if not data:
                     break
 
-                logging.debug(
+                logger.debug(
                     f"recv from %s:%s: {data!r}",
                     *self.client_address,
                 )
@@ -69,7 +71,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 continue
 
     def finish(self):
-        logging.debug("Closing connection from %s:%s", *self.client_address)
+        logger.debug("Closing connection from %s:%s", *self.client_address)
 
     def handle_data(self, data):
         self.request.sendall(data)

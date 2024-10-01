@@ -12,7 +12,7 @@ import dns.rdataclass
 
 from . import server
 
-logger = logging.getLogger("dane-policy-resolver")
+logger = logging.getLogger(__name__)
 
 resolver = dns.resolver.Resolver()
 resolver.use_edns(0, dns.flags.DO, 1232)
