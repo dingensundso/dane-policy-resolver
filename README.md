@@ -8,16 +8,12 @@ It can make the usage of [`postfix-mta-sts-resolver`](https://github.com/Snawoot
 Almost all of the code comes from [Mailu](https://github.com/Mailu/Mailu)'s [util.py](https://github.com/Mailu/Mailu/blob/master/core/admin/mailu/utils.py#L54). Thank you to all contributors!
 
 ## Usage
-This script does not include a socket server. So we ask postfix to do the network stuff.
+`dane-policy-resolver` listens on port `8460` by default.
 
-In `/etc/postfix/master.cf` add the following line:
+After starting it (e.g. with systemd) we can add `127.0.0.1:8460` as [`tcp_table`](https://www.postfix.org/tcp_table.5.html) to [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) in `/etc/postfix/main.cf`:
 
-    127.0.0.1:23001    inet  n       n       n       -       0       spawn user=nobody argv=/usr/local/sbin/dane-policy-resolver
-
-After that we can add `127.0.0.1:23001` as [`tcp_table`](https://www.postfix.org/tcp_table.5.html) to [`smtp_tls_policy_maps`](http://www.postfix.org/postconf.5.html#smtp_tls_policy_maps) in `/etc/postfix/main.cf`:
-
-    smtp_tls_policy_maps = tcp:127.0.0.1:23001
+    smtp_tls_policy_maps = tcp:127.0.0.1:8460
 
 If you are using [`postfix-mta-sts-resolver`](https://github.com/Snawoot/postfix-mta-sts-resolver) as well, you have to put it after `dane-policy-resolver`:
 
-    smtp_tls_policy_maps = tcp:127.0.0.1:23001,socketmap:inet:127.0.0.1:8461:postfix
+    smtp_tls_policy_maps = tcp:127.0.0.1:8460,socketmap:inet:127.0.0.1:8461:postfix
