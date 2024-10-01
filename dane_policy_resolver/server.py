@@ -6,8 +6,6 @@ import socketserver
 import threading
 from types import FrameType
 
-logging.basicConfig(level=logging.INFO)
-
 
 class SocketServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
