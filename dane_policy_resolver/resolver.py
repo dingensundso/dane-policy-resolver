@@ -1,10 +1,12 @@
 import logging
+from typing import List
 
 import dns.exception
 import dns.flags
 import dns.rdataclass
 import dns.rdatatype
 import dns.rdtypes
+import dns.rdtypes.ANY.MX
 import dns.rdtypes.ANY.TLSA
 import dns.resolver
 
@@ -60,6 +62,20 @@ def has_dane_record(domain: str, timeout: int = 10) -> bool:
     return False
 
 
+def get_mx_records(domain: str, timeout: int = 10) -> List[dns.rdtypes.ANY.MX.MX]:
+    try:
+        result = resolver.resolve(
+            domain,
+            dns.rdatatype.MX,
+            dns.rdataclass.IN,
+            lifetime=timeout,
+        )
+        return sorted(list(result), key=lambda r: r.preference)
+    except Exception as e:
+        logger.warn(f"Failed to get MX record for {domain}: {e}")
+        return []
+
+
 def is_dnssec_supported() -> bool:
     logger.info("Checking first reachable nameserver for DNSSEC support.")
     try:
@@ -77,12 +93,16 @@ class Handler(server.RequestHandler):
             cmd, key = data.split()
             domain = key.decode()
             if cmd == b"get":
-                if has_dane_record(domain):
-                    logger.info("Found TLSA record for %s" % domain)
-                    conn.sendall(b"200 dane-only\n")
-                else:
-                    logger.info("No TLSA record found for %s" % domain)
-                    conn.sendall(b"500 no dane record found\n")
+                for mx_record in get_mx_records(domain):
+                    mx = str(mx_record)
+                    if has_dane_record(mx):
+                        logger.info("Found TLSA record for %s (%s)" % (mx, domain))
+                        conn.sendall(b"200 dane-only\n")
+                        return
+                    else:
+                        logger.debug("No TLSA record found for %s (%s)" % (mx, domain))
+                logger.info("No TLSA record found for %s" % domain)
+                conn.sendall(b"500 no dane record found\n")
             else:
                 logger.error("unknown command: {!r}".format(data))
                 conn.sendall(b"500 unknown command\n")
